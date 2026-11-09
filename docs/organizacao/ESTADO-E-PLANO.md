@@ -27,23 +27,13 @@ Base: FilaZero-A3-Pacote-Completo.zip / FilaZero-A3/Projeto. A3.zip tem outro la
 
 Foi preservado o código funcional da base, sem implementar as correções atribuídas aos integrantes. A pasta .venv e o banco local não foram incorporados. MANIFESTO-BASE.json registra SHA-256 dos arquivos importados. A decisão deve ser revista se o grupo tiver mudanças locais mais novas ainda não enviadas.
 
-## Primeiras ações do grupo
+## Continuidade
 
-1. Confirmar a distribuição dos seis nomes e aceitar convites do repositório https://github.com/alissonsousa-code/A3FILAZERO.
-2. Usar o repositório A3FILAZERO já publicado; seguir o guia de Git atualizado.
-3. Cada integrante clona, configura sua identidade e cria uma branch da sua tarefa.
-4. Conferir instalação de Python, Node/npm e Cypress; registrar versões e manter o Flask aberto.
-5. Reproduzir as falhas prioritárias e revisar a especificação para entender o comportamento esperado.
-6. Trabalhar nas tarefas do QUADRO-EQUIPE.csv, atualizar status e vincular evidências.
-7. Revisar PRs e integrar um de cada vez, sobretudo os que alteram app.py.
+O repositório está publicado. Cada pessoa segue [CONTRIBUTING](../../CONTRIBUTING.md) e [sua tarefa](../../contribuicoes/README.md). Atualizar status e evidência no quadro; tarefas sem confirmação não são marcadas concluídas.
 
-## Regras de colaboração
+Alisson aplicou a contribuição de mensagens, confirmou dois testes específicos e dez na suíte local, conferiu 404/403 e enviou commit f03ba61 com evidências no PR #1. Na conferência em 09/11/2026, o PR permanecia aberto, com revisão solicitada a Filipe. Não marcar merge ou testes da main integrada como concluídos antes de ocorrerem.
 
-Status do quadro: A fazer → Em andamento → Em revisão → Concluído; usar Bloqueado com causa anotada. As tarefas começam A fazer por falta de confirmação de execução pela equipe. Uma tarefa de executar testes pode ser concluída com falhas se estas estiverem registradas; corrigir é outra tarefa. Não marcar correção concluída sem reteste.
-
-Atualização diária curta: tarefa, o que mudou, evidência e impedimento. Revisão cruzada obrigatória antes de integrar: pessoa diferente do autor. Não sobrescrever o projeto inteiro com outra versão ZIP. Não editar app.py simultaneamente sem combinar seções e atualizar main. A sequência F06 → F07 → F08 → F09 → F11 serializa mudanças nesse arquivo.
-
-O Git guarda snapshots de arquivos e diferenças; os membros não precisam subir pedaços soltos da aplicação. app.py já pertence à base: cada pessoa faz commit apenas da diferença correspondente à sua tarefa. Compartilhar arquivo não impede commits de autores diferentes em momentos distintos.
+Os demais responsáveis mantêm as atividades do quadro. Integrar mudanças em app.py uma de cada vez. A revisão e o reteste são parte do critério de conclusão.
 
 ## Resultado mínimo antes de apresentar
 
@@ -57,65 +47,18 @@ Aprovação de testes: aprovados ÷ executados × 100, apresentando não executa
 
 Cypress não substitui teste de carga com 200 usuários, avaliação com participantes 60+ ou garantia de disponibilidade. Medições de desempenho e acessibilidade exigem seus próprios procedimentos. A presença do workflow não comprova que ele executou no GitHub; o atual ainda não roda Cypress.
 
-## Alisson Sousa Santos
+## Responsabilidades
 
-Papel: Coordenação e rastreabilidade. Revisor principal: Cláudio.
+| Integrante | Frente |
+|---|---|
+| Alisson | Coordenação, escopo e mensagens de erro |
+| Cláudio | Ambiente, backend e presença |
+| Arthur | Reservas e integridade |
+| Guilherme | Automação Cypress |
+| Miguel | Regressão e segurança |
+| Filipe | Revisão, métricas e apresentação |
 
-Arquivos/seções: docs/organizacao/, README.md, docs/escopo-final.md.
-
-Contribuição esperada: Conferir o plano com a equipe, fechar escopo das funções pendentes e documentar decisões; atualizar instruções com o que realmente foi executado.
-
-Branch sugerida: `alisson/escopo-final`. Commit sugerido depois de executar a mudança: `docs: revisar escopo final e mapa de requisitos`. A responsabilidade é de continuidade e revisão; não atribui autoria da base recebida.
-
-## Cláudio Roberto Cruz Santiago Santos
-
-Papel: Backend, ambiente e perfis. Revisor principal: Arthur.
-
-Arquivos/seções: app.py: create_app, login, roles_required, call_next, notify; requirements*.txt; README.md.
-
-Contribuição esperada: Documentar ambiente reproduzível e ajustar chamada/presença e avisos de proximidade em tarefas separadas, com testes correspondentes.
-
-Branch sugerida: `claudio/presenca-chamada`. Commit sugerido depois de executar a mudança: `fix: exigir presenca na chamada de paciente`. A responsabilidade é de continuidade e revisão; não atribui autoria da base recebida.
-
-## Arthur Cordeiro de Carvalho Cruz
-
-Papel: Reservas e integridade. Revisor principal: Cláudio.
-
-Arquivos/seções: app.py: init_db, appointments, book_slot, cancel_appointment, checkin_appointment, block_slot; templates/appointments.html; tests/test_reservas.py.
-
-Contribuição esperada: Corrigir capacidade após check-in e nova reserva após cancelamento, preservando histórico e compatibilidade com banco existente.
-
-Branch sugerida: `arthur/capacidade-checkin`. Commit sugerido depois de executar a mudança: `fix: manter capacidade ocupada apos check-in`. A responsabilidade é de continuidade e revisão; não atribui autoria da base recebida.
-
-## Guilherme Cabral Teixeira
-
-Papel: Cypress e integração contínua. Revisor principal: Miguel.
-
-Arquivos/seções: cypress/e2e/, cypress.config.js, package.json, package-lock.json; .github/workflows/quality.yml.
-
-Contribuição esperada: Adicionar ao menos três casos aos dois existentes, executar os cinco, estabilizar massa e automatizar execução no pipeline se possível.
-
-Branch sugerida: `guilherme/cypress-cenarios`. Commit sugerido depois de executar a mudança: `test: adicionar cenarios E2E de acesso e autenticacao`. A responsabilidade é de continuidade e revisão; não atribui autoria da base recebida.
-
-## Miguel Lima Quadros Gomes
-
-Papel: Validação e regressão. Revisor principal: Guilherme.
-
-Arquivos/seções: tests/test_seguranca.py, tests/test_fila.py; evidencias/regressao/; docs/validacao/.
-
-Contribuição esperada: Criar verificações de permissões/fila, revisar os testes de reserva de Arthur e registrar execuções com versão e dados fictícios.
-
-Branch sugerida: `miguel/regressao-fila`. Commit sugerido depois de executar a mudança: `test: verificar permissoes e transicoes da fila`. A responsabilidade é de continuidade e revisão; não atribui autoria da base recebida.
-
-## Filipe Albuquerque Oliveira
-
-Papel: Revisão, métricas e apresentação. Revisor principal: Alisson.
-
-Arquivos/seções: CODE_REVIEW_CHECKLIST.md; docs/metricas/; docs/revisoes/; apresentacao/.
-
-Contribuição esperada: Revisar mudanças com checklist, calcular métricas com recorte declarado e consolidar evidências e slides finais.
-
-Branch sugerida: `filipe/metricas`. Commit sugerido depois de executar a mudança: `docs: registrar metricas e evidencias de qualidade`. A responsabilidade é de continuidade e revisão; não atribui autoria da base recebida.
+Arquivos, branches e verificações estão nos [roteiros individuais](../../contribuicoes/README.md); prazos e critérios estão no [quadro](QUADRO-EQUIPE.csv).
 
 ## Plano da apresentação final
 

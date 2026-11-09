@@ -459,23 +459,9 @@ Não começar uma instalação pesada durante a apresentação. Se o ambiente fa
 
 ## 11. Como apresentar o próprio versionamento
 
-Git registra snapshots/diferenças locais; GitHub compartilha repositório, PRs e resultados. Commit registra uma alteração; push envia; Pull Request propõe integração; merge integra. Branch separa o trabalho sem duplicar o projeto manualmente.
+O procedimento operacional está em [CONTRIBUTING](../CONTRIBUTING.md) e nos [roteiros individuais](../contribuicoes/README.md). Para a apresentação, mostrar o diff, explicar a regra, a alteração, o teste e o resultado. Os commits da importação são a base compartilhada; cada integrante demonstra sua contribuição posterior.
 
-Cada pessoa aceita o convite, clona, configura seu próprio nome/e-mail, segue o guia individual em contribuicoes/, aplica o patch, lê git diff, executa testes e faz commit da alteração que revisou. Não reenviar arquivos idênticos: se não há diferença, não há novo trabalho registrado. O patch é material preparado; o diff de aplicação e a verificação precisam ser compreendidos pelo responsável.
-
-Antes de enviar, conferir:
-
-```bat
-git status
-git diff
-git diff --cached
-```
-
-Depois de commit e push, abrir PR para main e pedir revisão de colega. Guardar URL e diff. No GitHub, as linhas vermelhas foram removidas e as verdes acrescentadas. A apresentação deve explicar a razão e o efeito, não só ler cores.
-
-Cláudio e Arthur mudam app.py em trechos diferentes; atualizar main e integrar um PR de cada vez. Se git apply --check falhar, pode ser pacote já integrado ou base alterada. Parar e conferir; não forçar nem substituir o app.py inteiro por uma cópia antiga.
-
-Mensagem de apresentação possível: “Esta é a alteração que revisei e apliquei, estes são os testes que executei e este é o resultado.” Informar o apoio recebido quando pertinente. Os commits da importação inicial são a base; não são prova da autoria individual de todos.
+Git registra alterações locais; push envia ao GitHub; PR propõe integração; revisão confere a mudança; merge integra. Branch de trabalho e main podem conter versões diferentes. A aprovação dos testes de uma branch não substitui a verificação da versão integrada.
 
 ## 12. Perguntas prováveis e ensaio da equipe
 

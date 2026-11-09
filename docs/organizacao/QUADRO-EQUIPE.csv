@@ -1,8 +1,8 @@
 ID;Responsável;Tarefa;Prazo interno proposto;Dependências;Status;Arquivos envolvidos;Critério de conclusão;Evidência/link
 F01;Alisson;Validar divisão de membros e base escolhida;10/11/2026;—;A fazer;docs/organizacao/;"Equipe confirma responsáveis, fonte-base e alterações de escopo; registrar decisões.";
-F02;Cláudio;Publicar a base em GitHub e convidar colaboradores;10/11/2026;F01;A fazer;Repositório remoto;"Repositório acessível aos seis, com main e histórico importado; não subir .venv ou banco.";
+F02;Cláudio;Publicar a base em GitHub e convidar colaboradores;10/11/2026;F01;"Parcial — base publicada; confirmar convites e acessos";Repositório remoto;"Repositório acessível aos seis, com main e histórico importado; não subir .venv ou banco.";https://github.com/alissonsousa-code/A3FILAZERO
 F03;Cláudio;Validar instalação em dois computadores;11/11/2026;F02;A fazer;"README.md; docs/validacao/ambiente.md";Python/Node/Cypress documentados e site abre nos dois computadores.;
-F04;Todos;Clonar repositório e configurar identidade própria;11/11/2026;F02;A fazer;Git local de cada membro;Cada pessoa usa nome/e-mail da própria conta, branch própria e entende add/commit/push/PR.;
+F04;Todos;Clonar repositório e configurar identidade própria;11/11/2026;F02;"Parcial — Alisson confirmado; demais membros a conferir";Git local de cada membro;Cada pessoa usa nome/e-mail da própria conta, branch própria e entende add/commit/push/PR.;
 F05;Miguel;Reproduzir falhas de reserva com massa isolada;13/11/2026;F03;A fazer;"evidencias/regressao/; docs/validacao/";Registrar nova reserva após cancelamento e capacidade após chegada, com commit e resultado real.;
 F06;Arthur;Corrigir capacidade após check-in;16/11/2026;F05;A fazer;"app.py; tests/test_reservas.py";"checked_in ocupa capacidade; segunda pessoa recusada; agenda e gestão consistentes; teste de regressão.";
 F07;Arthur;Corrigir nova reserva após cancelamento;17/11/2026;F06;A fazer;"app.py; tests/test_reservas.py";"Nova reserva sem erro; histórico preservado; banco antigo tratado; testes novos e existentes passam.";
@@ -22,3 +22,4 @@ F20;Alisson;Conferir commits reais e evidências dos autores;24/11/2026;F04,F17;
 F21;Filipe;Preparar slides e roteiro de apresentação;25/11/2026;F19,F20;A fazer;apresentacao/;Problema, arquitetura, Cypress, cinco testes, GitHub, métricas e limitações explicados.;
 F22;Todos;Ensaiar e revisar instalação no computador da aula;26/11/2026;F21;A fazer;"apresentacao/; evidencias/";"Todos explicam suas contribuições, uma regra e um teste; cópia de contingência identificada.";
 F23;Alisson;Postar slides e conferir entrega final;27/11/2026;F22;A fazer;Comprovante ULIFE;"Um integrante posta; outro confere arquivo e prazo/horário oficial.";
+F24;Alisson;Mensagens de erro, testes e integração;Após revisão;Revisão de Filipe;Em revisão — PR #1;"templates/error.html; tests/test_error_pages.py";"Revisão, merge e testes da main integrada; evidências anexadas";https://github.com/alissonsousa-code/A3FILAZERO/pull/1

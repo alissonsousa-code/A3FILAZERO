@@ -1,50 +1,34 @@
-# Alisson — Mensagens de erro e testes de interface
+# Alisson — Mensagens de erro e dois testes
 
-## Procedimento
+## Preparação
 
-Este pacote prepara a mudança. O responsável revisa, aplica e verifica antes de enviar. Cada commit deve usar o nome/e-mail do próprio membro e a conta autenticada correta.
+Seguir [CONTRIBUTING](../../CONTRIBUTING.md) e começar no clone com main atualizada e trabalho anterior guardado. Se esta alteração já estiver integrada, não reaplicar. Branch proposta: `alisson/mensagens-erros`.
 
-Instalar Git para Windows. Clonar uma vez (quem já clonou entra na pasta existente):
-
-```bat
-git clone https://github.com/alissonsousa-code/A3FILAZERO.git
-cd A3FILAZERO
-```
-
-Configurar seus dados reais:
+## Aplicação
 
 ```bat
-git config user.name "SEU NOME COMPLETO"
-git config user.email "SEU EMAIL DO GITHUB"
-git status
-```
-
-Com a árvore de trabalho limpa, atualizar, criar branch e aplicar:
-
-```bat
-git switch main
-git pull --ff-only origin main
 git switch -c alisson/mensagens-erros
 git apply --check contribuicoes/alisson/alteracoes.patch
 git apply contribuicoes/alisson/alteracoes.patch
 git diff
 ```
 
-Se --check falhar, pare e confira com a equipe se a mudança já foi integrada ou se houve alteração no trecho; não force nem substitua app.py inteiro. Os patches de Cláudio e Arthur foram preparados para trechos diferentes e verificados em conjunto. Não reaplique o mesmo patch.
+Se a verificação falhar, parar e conferir o estado do arquivo e da branch; não forçar. O teste usa os arquivos após aplicação.
 
-Instalar dependências Python na venv e verificar a alteração:
+## Verificação
 
 ```bat
-python -m pip install -r requirements-dev.txt
 python -m pytest -q tests/test_error_pages.py
 ```
 
-Arquivos afetados (após aplicar):
+Arquivos da tarefa:
 
 - `templates/error.html`
 - `tests/test_error_pages.py`
 
-Após revisar e testar:
+## Registro
+
+Somente após revisar a mudança e os resultados:
 
 ```bat
 git add templates/error.html tests/test_error_pages.py
@@ -53,18 +37,14 @@ git commit -m "feat: orientar usuario nas paginas de erro"
 git push -u origin alisson/mensagens-erros
 ```
 
-No GitHub, abrir Pull Request para main e pedir revisão a colega diferente. Guardar URL, diff e resultado do teste. Não adicionar as alterações de outros membros junto com sua tarefa. Os patches já versionados em contribuicoes são material de preparação; o commit individual é a aplicação revisada no código e seus testes.
+Abrir PR e seguir o fluxo de revisão em CONTRIBUTING. Guardar os resultados reais; não declarar aprovação antes da execução.
 
-## Como explicar depois de executar
+## Estudo
 
-“Revisei e apliquei mensagens de erro especificas para cada situacao e verifiquei o retorno para o inicio.”
+Após executar, pode explicar: “Revisei e apliquei mensagens de erro especificas para cada situacao e verifiquei o retorno para o inicio.”
 
-Use essa fala só depois de executar e conferir o resultado. Diga o que realmente mudou e explique o apoio recebido quando pertinente.
+Saber responder: Por que 400, 403 e 404 sao diferentes? Como a pagina recebe code e message?
 
-## Estudar para responder
+A explicação detalhada das alterações e seus limites está no [guia da equipe](../../docs/GUIA-DE-ESTUDO-E-APRESENTACAO.md).
 
-Por que 400, 403 e 404 sao diferentes? Como a pagina recebe code e message?
-
-## Verificação disponível
-
-A preparação combinada passou em 16 testes Python, Ruff e Bandit. A sintaxe do novo arquivo JavaScript foi verificada com Node. Isso não substitui a validação individual; Cypress e GitHub Actions desta proposta ainda não foram executados nesta preparação. As demais lacunas do protótipo, inclusive nova reserva após cancelamento, continuam pendentes.
+Registro em 09/11/2026: commit [f03ba61](https://github.com/alissonsousa-code/A3FILAZERO/commit/f03ba61aa6782559ef2c41f0f1495f76b0098587) enviado e [PR #1](https://github.com/alissonsousa-code/A3FILAZERO/pull/1) aberto, aguardando revisão. A aplicação local já foi realizada; próximos passos são aprovação, merge e verificação integrada. Não reaplicar o patch na mesma cópia.

@@ -2,7 +2,17 @@
 
 Projeto acadêmico da UC **Gestão e Qualidade de Software — UNIFACS**, elaborado a partir da especificação da 1ª entrega, com apoio de IA.
 
-Organização: [LEIA-PRIMEIRO.md](LEIA-PRIMEIRO.md). Contribuições: [pacotes da equipe](contribuicoes/README.md).
+## Navegação
+
+- [Instalação e execução](#3-instalação-no-windows)
+- [Estudo da equipe e demonstração Cypress](docs/GUIA-DE-ESTUDO-E-APRESENTACAO.md)
+- [Como contribuir pelo Git](CONTRIBUTING.md)
+- [Tarefas individuais e patches](contribuicoes/README.md)
+- [Etapa atual e responsabilidades](docs/organizacao/ESTADO-E-PLANO.md)
+- [Quadro de tarefas](docs/organizacao/QUADRO-EQUIPE.csv)
+- [Plano de qualidade](docs/PLANO_DE_QUALIDADE.md)
+
+A documentação foi consolidada: instruções de contribuição ficam em CONTRIBUTING, estudo no guia da equipe e passos específicos nos roteiros individuais.
 
 ## 1. O que está implementado
 
