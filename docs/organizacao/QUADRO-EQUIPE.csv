@@ -1,0 +1,24 @@
+ID;Responsável;Tarefa;Prazo interno proposto;Dependências;Status;Arquivos envolvidos;Critério de conclusão;Evidência/link
+F01;Alisson;Validar divisão de membros e base escolhida;10/11/2026;—;A fazer;docs/organizacao/;"Equipe confirma responsáveis, fonte-base e alterações de escopo; registrar decisões.";
+F02;Cláudio;Publicar a base em GitHub e convidar colaboradores;10/11/2026;F01;A fazer;Repositório remoto;"Repositório acessível aos seis, com main e histórico importado; não subir .venv ou banco.";
+F03;Cláudio;Validar instalação em dois computadores;11/11/2026;F02;A fazer;"README.md; docs/validacao/ambiente.md";Python/Node/Cypress documentados e site abre nos dois computadores.;
+F04;Todos;Clonar repositório e configurar identidade própria;11/11/2026;F02;A fazer;Git local de cada membro;Cada pessoa usa nome/e-mail da própria conta, branch própria e entende add/commit/push/PR.;
+F05;Miguel;Reproduzir falhas de reserva com massa isolada;13/11/2026;F03;A fazer;"evidencias/regressao/; docs/validacao/";Registrar nova reserva após cancelamento e capacidade após chegada, com commit e resultado real.;
+F06;Arthur;Corrigir capacidade após check-in;16/11/2026;F05;A fazer;"app.py; tests/test_reservas.py";"checked_in ocupa capacidade; segunda pessoa recusada; agenda e gestão consistentes; teste de regressão.";
+F07;Arthur;Corrigir nova reserva após cancelamento;17/11/2026;F06;A fazer;"app.py; tests/test_reservas.py";"Nova reserva sem erro; histórico preservado; banco antigo tratado; testes novos e existentes passam.";
+F08;Cláudio;Validar e ajustar chamada com presença;18/11/2026;F07;A fazer;"app.py: call_next; tests/test_fila.py";"Decisão consistente com UC08; ausente não é chamado se mantida pré-condição; teste e evidência.";
+F09;Cláudio;Implementar aviso de proximidade;19/11/2026;F08;A fazer;"app.py: notify/fila; tests/test_fila.py";"Aviso no limiar de três pessoas à frente, sem duplicação; medição e limites documentados.";
+F10;Alisson;Resolver escopo de gestão de horários ocupados;17/11/2026;F01;A fazer;docs/escopo-final.md;"Decidir com professor implementação ou redução de escopo; preservar rastreabilidade com UC09/CA09.";
+F11;Arthur;Implementar gestão conforme escopo acordado;21/11/2026;F10,F09;A fazer;"app.py; templates/management.html; tests/test_reservas.py";"Alterações de agenda e avisos correspondem à decisão; reteste com cidadãos afetados.";
+F12;Guilherme;Instalar Cypress e validar dois testes do pacote;12/11/2026;F03;A fazer;"cypress/e2e/filazero.cy.js; package-lock.json";"Execução real registrada; falhas de instalação e de aplicação distinguidas.";
+F13;Guilherme;Adicionar pelo menos três testes Cypress;18/11/2026;F12;A fazer;"cypress/e2e/; cypress.config.js";"Cinco casos únicos: existentes mais home, senha incorreta e proteção de rota, ou fluxos equivalentes; todos executados.";
+F14;Guilherme;Ampliar E2E de cidadão e atendimento;21/11/2026;F13,F09;A fazer;"cypress/e2e/; dados de teste";"Fila, presença e chamada com sessões e massa controladas; resultados conferidos no DOM.";
+F15;Miguel;Criar regressão adicional de fila e segurança;21/11/2026;F08;A fazer;"tests/test_fila.py; tests/test_seguranca.py";"Testar decisões relevantes e estados/permissões; evitar testes que apenas repetem implementação.";
+F16;Guilherme;Adicionar Cypress ao pipeline;22/11/2026;F13;A fazer; .github/workflows/quality.yml;"Pipeline instala dependências, inicia servidor, aguarda disponibilidade e executa E2E; log acessível.";
+F17;Miguel;Executar regressão após integração;23/11/2026;F11,F14,F15,F16;A fazer;evidencias/regressao/;Versão integrada com testes Python/Cypress, resultados por cenário e defeitos restantes.;
+F18;Filipe;Revisar cada PR antes da integração;23/11/2026;PRs das tarefas;A fazer;"docs/revisoes/; CODE_REVIEW_CHECKLIST.md";"Checklist real com revisor, versão e decisão; autor não aprova sua própria alteração.";
+F19;Filipe;Medir cobertura e métricas finais;24/11/2026;F17;A fazer;docs/metricas/;"Cobertura Python e aprovação E2E separadas; taxa de correção e densidade com universo definido.";
+F20;Alisson;Conferir commits reais e evidências dos autores;24/11/2026;F04,F17;A fazer;"docs/organizacao/; evidencias/git/";"No mínimo dois autores reais exigidos pelo edital, idealmente seis; prints e versão; sem commits artificiais.";
+F21;Filipe;Preparar slides e roteiro de apresentação;25/11/2026;F19,F20;A fazer;apresentacao/;Problema, arquitetura, Cypress, cinco testes, GitHub, métricas e limitações explicados.;
+F22;Todos;Ensaiar e revisar instalação no computador da aula;26/11/2026;F21;A fazer;"apresentacao/; evidencias/";"Todos explicam suas contribuições, uma regra e um teste; cópia de contingência identificada.";
+F23;Alisson;Postar slides e conferir entrega final;27/11/2026;F22;A fazer;Comprovante ULIFE;"Um integrante posta; outro confere arquivo e prazo/horário oficial.";

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Painel da recepção{% endblock %}
+
+{% macro presence_form(item) %}
+  <form class="presence-form" method="post" action="{{ url_for('confirm_presence') }}">
+    {{ ui.csrf() }}
+    <input type="hidden" name="entry_id" value="{{ item.id }}">
+    <label class="checkbox-row">
+      <input type="checkbox" name="priority_confirmed" {% if item.priority_confirmed %}checked{% endif %}>
+      <span>Confirmar prioridade</span>
+    </label>
+    <button class="btn btn-secondary" type="submit">Registrar presença</button>
+  </form>
+{% endmacro %}
+
+{% block content %}
+  {% set status_labels = {'waiting': 'Aguardando', 'present': 'Presente', 'called': 'Chamado', 'attending': 'Em atendimento'} %}
+  {% set status_tones = {'waiting': 'neutral', 'present': 'success', 'called': 'warning', 'attending': 'info'} %}
+  {% call ui.page_heading('Equipe da unidade', 'Painel da recepção', unit.name ~ ' · ' ~ ('Fila aberta' if unit.is_open else 'Fila encerrada')) %}
+    <form method="post" action="{{ url_for('call_next') }}">
+      {{ ui.csrf() }}
+      <button class="btn btn-primary" type="submit">Chamar próximo paciente</button>
+    </form>
+  {% endcall %}
+
+  <div class="split-grid">
+    <section class="panel">
+      {% call ui.panel_heading('Fila de atendimento', 'Acompanhe as chegadas, as chamadas e os atendimentos em andamento.') %}
+        {{ ui.badge(queue|length ~ ' na fila ativa', 'info') }}
+      {% endcall %}
+      {% if queue %}
+        <ul class="item-list" role="list">
+          {% for item in queue %}
+            <li class="patient">
+              <span class="patient-number" aria-hidden="true">
+                {% if item.status in ['called', 'attending'] %}{{ ui.icon('check') }}{% else %}{{ loop.index }}{% endif %}
+              </span>
+              <div class="patient-info">
+                <h3>{{ item.citizen_name }}</h3>
+                <p>{{ item.service }} · CPF {{ '***.***.' ~ item.citizen_cpf[6:9] ~ '-**' if item.citizen_cpf else 'não informado' }}</p>
+                <div class="patient-badges">
+                  {{ ui.badge(status_labels.get(item.status, item.status), status_tones.get(item.status, 'neutral')) }}
+                  {% if item.priority_confirmed %}
+                    {{ ui.badge('Prioridade confirmada', 'success') }}
+                  {% elif item.priority_declared %}
+                    {{ ui.badge('Prioridade a confirmar', 'warning') }}
+                  {% endif %}
+                </div>
+              </div>
+              <div class="patient-actions">
+                {% if item.status in ['waiting', 'present'] %}
+                  {{ presence_form(item) }}
+                {% elif item.status == 'called' %}
+                  <form method="post" action="{{ url_for('start_attendance', entry_id=item.id) }}">
+                    {{ ui.csrf() }}
+                    <button class="btn btn-primary" type="submit">Iniciar atendimento</button>
+                  </form>
+                  <form method="post" action="{{ url_for('mark_no_show', entry_id=item.id) }}">
+                    {{ ui.csrf() }}
+                    <button class="btn btn-danger-text" type="submit">Marcar ausente</button>
+                  </form>
+                {% elif item.status == 'attending' %}
+                  <form method="post" action="{{ url_for('complete_attendance', entry_id=item.id) }}">
+                    {{ ui.csrf() }}
+                    <button class="btn btn-primary" type="submit">Concluir atendimento</button>
+                  </form>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        {{ ui.empty_state('Fila vazia', 'Os cidadãos aparecem aqui assim que entram na fila virtual.') }}
+      {% endif %}
+    </section>
+
+    <aside class="panel content-stack">
+      <div>
+        {{ ui.panel_heading('Localizar paciente', 'Busque na fila ativa e nos agendamentos de hoje.') }}
+        <form class="form-stack" method="get" role="search" aria-label="Pacientes">
+          <div class="field">
+            <label for="q">Nome ou CPF</label>
+            <input id="q" name="q" type="search" value="{{ search }}" placeholder="Digite o nome ou CPF">
+          </div>
+          <button class="btn btn-secondary btn-full" type="submit">{{ ui.icon('search') }} Buscar</button>
+        </form>
+      </div>
+
+      {% if search %}
+        <section class="search-results" aria-label="Resultados da busca">
+          <h3>Na fila ativa</h3>
+          {% for item in found %}
+            <div class="result">
+              <div class="result-copy">
+                <strong>{{ item.citizen_name }}</strong>
+                <p>{{ item.service }} · {{ status_labels.get(item.status, item.status) }}</p>
+              </div>
+              {{ presence_form(item) }}
+            </div>
+          {% else %}
+            <p class="muted">Nenhum paciente encontrado na fila ativa.</p>
+          {% endfor %}
+
+          {% if found_appointments %}
+            <h3>Agendamentos de hoje</h3>
+            {% for item in found_appointments %}
+              <div class="result">
+                <div class="result-copy">
+                  <strong>{{ item.citizen_name }}</strong>
+                  <p>{{ item.service }} · {{ item.slot_time }}</p>
+                </div>
+                <form method="post" action="{{ url_for('checkin_appointment') }}">
+                  {{ ui.csrf() }}
+                  <input type="hidden" name="appointment_id" value="{{ item.appointment_id }}">
+                  <button class="btn btn-secondary" type="submit">Registrar chegada</button>
+                </form>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </section>
+      {% endif %}
+
+      {{ ui.notice('A prioridade confirmada vem primeiro. Dentro de cada grupo, vale a ordem de entrada na fila.') }}
+    </aside>
+  </div>
+{% endblock %}

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88">
+  <defs>
+    <symbol id="fila-e-vez" viewBox="0 0 86 48">
+      <g fill="currentColor">
+        <circle cx="12" cy="25" r="5.75"/>
+        <circle cx="24.5" cy="17.5" r="5.75"/>
+        <circle cx="38" cy="12" r="6.1"/>
+        <path d="M1 46v-4a11.5 11.5 0 0 1 23 0v4Z"/>
+        <path d="M17 30a10.5 10.5 0 0 1 18.5 7v2H26.6A14.2 14.2 0 0 0 17 30Z"/>
+        <path d="M30.5 23.5a11 11 0 0 1 15.2-3.5v15.5h-7.4a13.5 13.5 0 0 0-7.8-12Z"/>
+      </g>
+      <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="50" y="10" width="33" height="32" rx="6"/>
+        <path d="M58 5v10m17-10v10M58 26l5.5 5.5L74.5 21"/>
+      </g>
+    </symbol>
+  </defs>
+  <rect width="88" height="88" rx="17" fill="#163b69"/>
+  <use href="#fila-e-vez" x="6" y="22" width="76" height="43" color="#fff"/>
+</svg>

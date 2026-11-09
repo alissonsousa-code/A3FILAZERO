@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Entrar{% endblock %}
+
+{% block content %}
+  <section class="auth-layout">
+    <header class="auth-intro">
+      <p class="eyebrow">Acesso ao FilaZero</p>
+      <h1>Entrar na sua conta</h1>
+      <p>Acesse sua fila, seus agendamentos e os avisos sobre seu atendimento.</p>
+      {{ ui.notice('Este é um ambiente acadêmico. Use apenas dados de demonstração.', 'shield') }}
+    </header>
+
+    <section class="panel auth-card" aria-label="Formulário de acesso">
+      <form method="post" class="form-stack">
+        {{ ui.csrf() }}
+        <div class="field">
+          <label for="identifier">CPF ou e-mail</label>
+          <input id="identifier" name="identifier" autocomplete="username" autocapitalize="none"
+                 value="{{ request.form.get('identifier', '') }}" required>
+        </div>
+        <div class="field">
+          <label for="password">Senha</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn-primary btn-full" type="submit">Entrar</button>
+      </form>
+      <p class="auth-switch">Ainda não tem conta? <a href="{{ url_for('register') }}">Criar conta</a></p>
+      <details class="demo-access">
+        <summary>Contas de demonstração</summary>
+        <dl>
+          {% if config.DEMO_MODE %}
+            <div>
+              <dt>Cidadão</dt>
+              <dd>cidadao@filazero.local</dd>
+              <dd>Senha: <code>Cidadao@123</code></dd>
+            </div>
+          {% endif %}
+          <div>
+            <dt>Recepção</dt>
+            <dd>recepcao@filazero.local</dd>
+            <dd>Senha: <code>Recepcao@123</code></dd>
+          </div>
+          <div>
+            <dt>Gestor</dt>
+            <dd>gestor@filazero.local</dd>
+            <dd>Senha: <code>Gestor@123</code></dd>
+          </div>
+        </dl>
+      </details>
+    </section>
+  </section>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Criar conta{% endblock %}
+
+{% block content %}
+  <section class="auth-layout">
+    <header class="auth-intro">
+      <p class="eyebrow">Área do cidadão</p>
+      <h1>Criar sua conta</h1>
+      <p>Cadastre-se para entrar na fila virtual, agendar um horário e acompanhar seu atendimento.</p>
+      {{ ui.notice('Preencha o cadastro com dados fictícios para explorar a demonstração.', 'shield') }}
+    </header>
+
+    <section class="panel auth-card" aria-label="Formulário de cadastro">
+      <p class="muted">Os campos com asterisco (*) são obrigatórios.</p>
+      <form method="post" class="form-stack">
+        {{ ui.csrf() }}
+        <div class="form-grid">
+          <div class="field field-wide">
+            <label for="name">Nome completo *</label>
+            <input id="name" name="name" autocomplete="name" minlength="3"
+                   value="{{ request.form.get('name', '') }}" required>
+          </div>
+          <div class="field">
+            <label for="cpf">CPF *</label>
+            <input id="cpf" name="cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14"
+                   value="{{ request.form.get('cpf', '') }}" required>
+          </div>
+          <div class="field">
+            <label for="birth_date">Data de nascimento *</label>
+            <input id="birth_date" name="birth_date" type="date" autocomplete="bday"
+                   value="{{ request.form.get('birth_date', '') }}" required>
+          </div>
+          <div class="field">
+            <label for="phone">Telefone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="(71) 90000-0000"
+                   value="{{ request.form.get('phone', '') }}">
+          </div>
+          <div class="field">
+            <label for="email">E-mail *</label>
+            <input id="email" name="email" type="email" autocomplete="email"
+                   value="{{ request.form.get('email', '') }}" required>
+          </div>
+          <div class="field field-wide">
+            <label for="password">Senha *</label>
+            <input id="password" name="password" type="password" autocomplete="new-password"
+                   minlength="8" aria-describedby="password-hint" required>
+            <p class="field-hint" id="password-hint">Use pelo menos 8 caracteres.</p>
+          </div>
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" name="lgpd_consent" {% if request.form.get('lgpd_consent') %}checked{% endif %} required>
+          <span>Li e aceito o termo de consentimento para o tratamento dos meus dados, conforme a LGPD, para utilização deste ambiente demonstrativo. *</span>
+        </label>
+        <button class="btn btn-primary btn-full" type="submit">Finalizar cadastro</button>
+      </form>
+      <p class="auth-switch">Já tem conta? <a href="{{ url_for('login') }}">Entrar</a></p>
+    </section>
+  </section>
+{% endblock %}

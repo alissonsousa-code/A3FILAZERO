@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Relatórios{% endblock %}
+
+{% block content %}
+  {% call ui.page_heading('Indicadores da unidade', 'Relatório de atendimentos', 'Acompanhe o movimento da unidade por data.') %}
+    <a class="btn btn-secondary" href="{{ url_for('reports_csv', data=selected) }}">{{ ui.icon('download') }} Exportar CSV</a>
+  {% endcall %}
+
+  <div class="content-stack">
+    <section class="panel" aria-label="Período do relatório">
+      <form class="report-filter" method="get">
+        <div class="field">
+          <label for="data">Data do relatório</label>
+          <input id="data" name="data" type="date" value="{{ selected }}" required>
+        </div>
+        <button class="btn btn-primary" type="submit">Filtrar relatório</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      {{ ui.panel_heading('Resumo da fila virtual') }}
+      <dl class="metric-grid">
+        <div class="metric-card"><dt>Atendimentos concluídos</dt><dd>{{ counts.get('completed', 0) }}</dd></div>
+        <div class="metric-card"><dt>Ausências</dt><dd>{{ counts.get('no_show', 0) }}</dd></div>
+        <div class="metric-card"><dt>Cancelamentos</dt><dd>{{ counts.get('cancelled', 0) }}</dd></div>
+        <div class="metric-card"><dt>Espera média até a chamada</dt><dd>{{ avg_wait }} <span>min</span></dd></div>
+      </dl>
+    </section>
+
+    <section class="panel">
+      {{ ui.panel_heading('Agendamentos e fila em andamento') }}
+      <dl class="metric-grid metric-secondary">
+        <div class="metric-card"><dt>Agendamentos confirmados</dt><dd>{{ appointment_counts.get('booked', 0) }}</dd></div>
+        <div class="metric-card"><dt>Agendamentos cancelados</dt><dd>{{ appointment_counts.get('cancelled', 0) }}</dd></div>
+        <div class="metric-card"><dt>Pacientes aguardando</dt><dd>{{ counts.get('waiting', 0) + counts.get('present', 0) }}</dd></div>
+        <div class="metric-card"><dt>Chamados ou em atendimento</dt><dd>{{ counts.get('called', 0) + counts.get('attending', 0) }}</dd></div>
+      </dl>
+    </section>
+    {{ ui.notice('Os indicadores refletem os registros do banco de demonstração.') }}
+  </div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Unidades{% endblock %}
+
+{% block content %}
+  {{ ui.page_heading('Rede de atendimento', 'Encontre sua unidade', 'Pesquise por bairro ou nome e escolha o serviço de que você precisa.') }}
+
+  <div class="content-stack">
+    <form class="search-form panel" method="get" role="search" aria-label="Unidades">
+      <div class="field">
+        <label for="q">Bairro ou nome da unidade</label>
+        <input id="q" name="q" type="search" value="{{ term }}" placeholder="Ex.: Centro">
+      </div>
+      <button class="btn btn-primary" type="submit">{{ ui.icon('search') }} Pesquisar</button>
+    </form>
+
+    {% if units %}
+      <div class="card-grid">
+        {% for unit in units %}
+          <article class="panel unit-card">
+            <header>
+              <p class="eyebrow">{{ unit.neighborhood }}</p>
+              <h2>{{ unit.name }}</h2>
+            </header>
+            <div>{{ ui.badge('Fila aberta' if unit.is_open else 'Fila encerrada', 'success' if unit.is_open else 'neutral') }}</div>
+            <p class="muted">{{ unit.address }}</p>
+            <p class="unit-hours">{{ ui.icon('clock') }} {{ unit.opening_hours }}</p>
+
+            {% if unit.is_open %}
+              <form action="{{ url_for('join_queue') }}" method="post" class="form-stack">
+                {{ ui.csrf() }}
+                <input type="hidden" name="unit_id" value="{{ unit.id }}">
+                <div class="field">{{ ui.service_select('service-' ~ unit.id) }}</div>
+                <label class="checkbox-row">
+                  <input type="checkbox" name="priority_declared">
+                  <span>Declaro que tenho direito a atendimento prioritário. A recepção confirma essa condição.</span>
+                </label>
+                <button class="btn btn-primary btn-full" type="submit">Entrar na fila virtual</button>
+              </form>
+            {% else %}
+              <div class="form-stack">
+                <p class="muted">Você pode consultar horários para agendar.</p>
+                <a class="btn btn-secondary btn-full" href="{{ url_for('appointments') }}">Ver agendamentos</a>
+              </div>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <section class="panel">
+        {{ ui.empty_state('Nenhuma unidade encontrada', 'Tente pesquisar por outro bairro ou nome.') }}
+      </section>
+    {% endif %}
+    {{ ui.notice('As unidades e os endereços são fictícios e fazem parte da demonstração acadêmica.') }}
+  </div>
+{% endblock %}

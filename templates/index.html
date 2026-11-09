@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Início{% endblock %}
+
+{% block content %}
+  {% set is_citizen = current_user and current_user.role == 'citizen' %}
+  {% set is_staff = current_user and not is_citizen %}
+  <section class="service-banner" aria-labelledby="home-title">
+    <div class="container service-banner-inner">
+      <div>
+        <p class="service-label">Serviços ao cidadão</p>
+        <h1 id="home-title">Fila e agendamento na UBS</h1>
+        <p class="service-lead">Consulte as unidades de saúde, entre na fila virtual ou escolha um horário para seu atendimento.</p>
+        <div class="actions service-actions">
+          {% if is_citizen %}
+            <a class="btn btn-banner" href="{{ url_for('units') }}">Consultar unidades</a>
+            <a class="service-link" href="{{ url_for('dashboard') }}">Acessar meu painel</a>
+          {% elif is_staff %}
+            <a class="btn btn-banner" href="{{ url_for('staff_dashboard') }}">Abrir painel da recepção</a>
+          {% else %}
+            <a class="btn btn-banner" href="{{ url_for('register') }}">Criar minha conta</a>
+            <a class="service-link" href="{{ url_for('login') }}">Já tenho cadastro</a>
+          {% endif %}
+        </div>
+      </div>
+      <aside class="service-note">
+        <h2>Ambiente de demonstração</h2>
+        <p>O FilaZero é um projeto acadêmico. As unidades e os horários apresentados são fictícios.</p>
+      </aside>
+    </div>
+  </section>
+
+  <div class="container home-content">
+    <section id="como-funciona" aria-labelledby="how-title">
+      <h2 class="home-heading" id="how-title">Como funciona</h2>
+      <ol class="service-steps">
+        <li>
+          <h3>Consulte a unidade</h3>
+          <p>Pesquise pelo nome ou bairro para ver os serviços e o horário de funcionamento.</p>
+        </li>
+        <li>
+          <h3>Entre na fila ou agende um horário</h3>
+          <p>Escolha um serviço para entrar na fila virtual ou reserve um horário na agenda da unidade.</p>
+        </li>
+        <li>
+          <h3>Acompanhe pelo seu painel</h3>
+          <p>Consulte sua posição, a espera estimada e os avisos enviados pela recepção.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="unidades" aria-labelledby="network-title">
+      <h2 class="home-heading" id="network-title">Unidades de atendimento</h2>
+      <p class="muted">Unidades fictícias em bairros de Salvador.</p>
+      <ul class="network-list" role="list">
+        {% for unit in units %}
+          <li>
+            <div class="network-unit">
+              <strong>{{ unit.name }}</strong>
+              <span>{{ unit.neighborhood }} · {{ unit.opening_hours }}</span>
+            </div>
+            {{ ui.badge('Fila aberta' if unit.is_open else 'Fila encerrada', 'success' if unit.is_open else 'neutral') }}
+          </li>
+        {% else %}
+          <li>Nenhuma unidade disponível no momento.</li>
+        {% endfor %}
+      </ul>
+      {% if is_citizen %}
+        <a class="section-link" href="{{ url_for('units') }}">Ver serviços das unidades</a>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

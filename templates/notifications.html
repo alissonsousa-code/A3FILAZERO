@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Avisos{% endblock %}
+
+{% block content %}
+  {{ ui.page_heading('Área do cidadão', 'Seus avisos', 'Acompanhe chamadas, confirmações e outras atualizações sobre seu atendimento.') }}
+
+  <div class="content-stack">
+    <section class="panel" aria-label="Avisos recentes">
+      {% if items %}
+        <ul class="item-list" role="list">
+          {% for item in items %}
+            <li class="notification-item">
+              <div>
+                <h2>{{ item.title }}</h2>
+                <p>{{ item.message }}</p>
+                <time datetime="{{ item.created_at }}">
+                  {{ item.created_at[8:10] }}/{{ item.created_at[5:7] }}/{{ item.created_at[0:4] }} às {{ item.created_at[11:16] }}
+                </time>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        {{ ui.empty_state('Nenhum aviso por enquanto', 'Os avisos sobre sua fila e seus agendamentos aparecerão aqui.') }}
+      {% endif %}
+    </section>
+    {{ ui.notice('Os avisos deste protótipo são exibidos no FilaZero.') }}
+  </div>
+{% endblock %}

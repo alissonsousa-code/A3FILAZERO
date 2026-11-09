@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Agendamentos{% endblock %}
+
+{% block content %}
+  {{ ui.page_heading('Agenda digital', 'Agendamentos', 'Consulte horários disponíveis para consultas, vacinação e exames.') }}
+
+  <div class="content-stack">
+    <section class="panel">
+      {% call ui.panel_heading('Meus agendamentos') %}
+        <a class="btn btn-text" href="#horarios">Ver horários disponíveis {{ ui.icon('arrow-down') }}</a>
+      {% endcall %}
+      {% if mine %}
+        <ul class="item-list" role="list">
+          {% for appointment in mine %}
+            <li class="item-row">
+              {{ ui.date_tile(appointment.slot_date) }}
+              <div class="item-copy">
+                <strong>{{ appointment.service }}</strong>
+                <span>{{ appointment.unit_name }} · {{ appointment.slot_time }}</span>
+                <span>Código {{ appointment.code }}</span>
+              </div>
+              {% if appointment.status == 'booked' %}
+                {{ ui.badge('Confirmado', 'success') }}
+                <form method="post" action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}"
+                      data-confirm="Cancelar este agendamento?">
+                  {{ ui.csrf() }}
+                  <button class="btn btn-danger-text" type="submit">Cancelar</button>
+                </form>
+              {% elif appointment.status == 'checked_in' %}
+                {{ ui.badge('Presença registrada', 'info') }}
+              {% else %}
+                {{ ui.badge('Cancelado') }}
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">Você ainda não tem agendamentos.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel" id="horarios">
+      {{ ui.panel_heading('Horários disponíveis', 'Escolha um serviço e confira a unidade, a data e o horário antes de reservar.') }}
+      <div class="slot-grid">
+        {% for slot in slots if slot.capacity > slot.booked %}
+          {% set remaining = slot.capacity - slot.booked %}
+          <article class="slot-card">
+            {{ ui.date_tile(slot.slot_date) }}
+            <div class="item-copy">
+              <strong>{{ slot.service }}</strong>
+              <span>{{ slot.unit_name }} · {{ slot.neighborhood }}</span>
+              <span class="slot-hours">{{ slot.slot_time }} · {{ remaining }} {{ 'vaga' if remaining == 1 else 'vagas' }}</span>
+            </div>
+            <form method="post" action="{{ url_for('book_slot') }}">
+              {{ ui.csrf() }}
+              <input type="hidden" name="slot_id" value="{{ slot.id }}">
+              <button class="btn btn-primary" type="submit"
+                      aria-label="Reservar {{ slot.service }} em {{ slot.unit_name }}, {{ slot.slot_date[8:10] }}/{{ slot.slot_date[5:7] }} às {{ slot.slot_time }}">Reservar</button>
+            </form>
+          </article>
+        {% else %}
+          {{ ui.empty_state('Nenhum horário disponível', 'Consulte a agenda novamente mais tarde.') }}
+        {% endfor %}
+      </div>
+    </section>
+    {{ ui.notice('Os horários desta agenda são fictícios e fazem parte da demonstração acadêmica.') }}
+  </div>
+{% endblock %}

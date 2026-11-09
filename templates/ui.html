@@ -1,0 +1,91 @@
+{% macro icon(name, class_name='') -%}
+  <svg class="icon{% if class_name %} {{ class_name }}{% endif %}" aria-hidden="true" focusable="false">
+    <use href="{{ url_for('static', filename='icons.svg') }}#{{ name }}"></use>
+  </svg>
+{%- endmacro %}
+
+{% macro csrf() -%}
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+{%- endmacro %}
+
+{% macro brand() -%}
+  <a class="brand" href="{{ url_for('index') }}">
+    <svg class="brand-symbol" viewBox="0 0 86 48" aria-hidden="true" focusable="false">
+      <use href="{{ url_for('static', filename='brand.svg') }}#fila-e-vez" width="86" height="48"/>
+    </svg>
+    <span>FilaZero</span>
+  </a>
+{%- endmacro %}
+
+{% macro nav_link(endpoint, label, related=(), count=0) -%}
+  {% set active = request.endpoint == endpoint or request.endpoint in related %}
+  <a class="nav-link{% if active %} is-active{% endif %}" href="{{ url_for(endpoint) }}"
+     {% if active %}aria-current="{{ 'page' if request.endpoint == endpoint else 'location' }}"{% endif %}>
+    {{ label }}
+    {% if count %}<span class="nav-count" aria-label="{{ count }} avisos não lidos">{{ count }}</span>{% endif %}
+  </a>
+{%- endmacro %}
+
+{% macro badge(label, tone='neutral') -%}
+  <span class="badge badge-{{ tone }}">{{ label }}</span>
+{%- endmacro %}
+
+{% macro page_heading(context, title, description) -%}
+  <header class="page-heading">
+    <div>
+      {% if context %}<p class="eyebrow">{{ context }}</p>{% endif %}
+      <h1>{{ title }}</h1>
+      <p class="page-description">{{ description }}</p>
+    </div>
+    {% if caller is defined %}<div class="heading-actions">{{ caller() }}</div>{% endif %}
+  </header>
+{%- endmacro %}
+
+{% macro panel_heading(title, description='') -%}
+  <header class="panel-heading">
+    <div>
+      <h2>{{ title }}</h2>
+      {% if description %}<p>{{ description }}</p>{% endif %}
+    </div>
+    {% if caller is defined %}{{ caller() }}{% endif %}
+  </header>
+{%- endmacro %}
+
+{% macro empty_state(title, description) -%}
+  <div class="empty-state">
+    <p class="empty-title">{{ title }}</p>
+    <p>{{ description }}</p>
+    {% if caller is defined %}<div class="actions">{{ caller() }}</div>{% endif %}
+  </div>
+{%- endmacro %}
+
+{% macro shortcut(endpoint, title, description) -%}
+  <a class="shortcut" href="{{ url_for(endpoint) }}">
+    <strong>{{ title }}</strong>
+    <span>{{ description }}</span>
+  </a>
+{%- endmacro %}
+
+{% macro notice(message, symbol='info') -%}
+  <div class="notice">{{ icon(symbol) }}<p>{{ message }}</p></div>
+{%- endmacro %}
+
+{% macro date_tile(value) -%}
+  <time class="date-tile" datetime="{{ value }}" aria-label="{{ value[8:10] }}/{{ value[5:7] }}/{{ value[0:4] }}">
+    <strong>{{ value[8:10] }}</strong>
+    <span>{{ value[5:7] }}/{{ value[0:4] }}</span>
+  </time>
+{%- endmacro %}
+
+{% macro service_select(id) -%}
+  <label for="{{ id }}">Serviço</label>
+  <select id="{{ id }}" name="service" required>
+    <option value="Consulta clínica">Consulta clínica</option>
+    <option value="Vacinação">Vacinação</option>
+    <option value="Exames">Exames</option>
+  </select>
+{%- endmacro %}
+
+{% macro queue_status(status) -%}
+  {{ {'waiting': 'Aguardando', 'present': 'Presença confirmada', 'called': 'Você foi chamado!', 'attending': 'Em atendimento'}.get(status, status) }}
+{%- endmacro %}

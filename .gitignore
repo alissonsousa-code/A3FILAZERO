@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+instance/*.sqlite3
+.env
+node_modules/
+cypress/videos/
+cypress/screenshots/
+
+# Ambiente local e dados gerados
+instance/
+*.sqlite
+*.sqlite3
+*.db
+.env.*
+!.env.example
+coverage.xml
+coverage.json
+.DS_Store
+Thumbs.db

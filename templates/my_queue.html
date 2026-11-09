@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Minha fila{% endblock %}
+
+{% block content %}
+  {% call ui.page_heading('Área do cidadão', 'Minha fila virtual', 'Confira sua posição e o status do atendimento.') %}
+    <a class="btn btn-secondary" href="{{ url_for('dashboard') }}">{{ ui.icon('arrow-left') }} Voltar ao painel</a>
+  {% endcall %}
+
+  {% if entry %}
+    <div class="split-grid">
+      <section class="panel content-stack" data-queue-poll="{{ url_for('api_my_queue') }}">
+        <div class="queue-top">
+          <div>
+            <p>{{ entry.unit_name }} · {{ entry.service }}</p>
+            <h2 id="queue-status-label" aria-live="polite">{{ ui.queue_status(entry.status) }}</h2>
+            <p>Entrada às <time datetime="{{ entry.created_at }}">{{ entry.created_at[11:16] }}</time></p>
+          </div>
+        </div>
+        <div class="queue-card">
+          <dl class="queue-metrics">
+            <div><dt>Posição na fila</dt><dd class="queue-number" id="queue-position">{{ position.position or '—' }}</dd></div>
+            <div><dt>Espera estimada</dt><dd class="queue-number" id="queue-estimate">{{ position.estimated_minutes }} min</dd></div>
+          </dl>
+          <p class="field-hint" id="queue-updated">A posição é consultada a cada 5 segundos.</p>
+        </div>
+        {% if entry.status in ['waiting', 'present', 'called'] %}
+          <form method="post" action="{{ url_for('cancel_queue', entry_id=entry.id) }}"
+                data-confirm="Deseja sair desta fila?" data-queue-cancel>
+            {{ ui.csrf() }}
+            <button class="btn btn-danger" type="submit">Sair da fila</button>
+          </form>
+        {% endif %}
+      </section>
+
+      <aside class="panel">
+        {{ ui.panel_heading('Como a fila funciona') }}
+        <p class="muted">A previsão é aproximada. Ela considera 15 minutos por posição e pode mudar durante o atendimento.</p>
+        <p class="queue-help">A recepção precisa confirmar presencialmente a prioridade declarada.</p>
+      </aside>
+    </div>
+  {% else %}
+    <section class="panel">
+      {% call ui.empty_state('Nenhuma fila ativa', 'Quando você entrar em uma fila, sua posição aparecerá aqui.') %}
+        <a class="btn btn-primary" href="{{ url_for('units') }}">Encontrar unidade</a>
+      {% endcall %}
+    </section>
+  {% endif %}
+{% endblock %}

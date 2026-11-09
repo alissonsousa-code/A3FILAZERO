@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Meu painel{% endblock %}
+
+{% block content %}
+  {% call ui.page_heading('', 'Meu painel', 'Consulte sua posição na fila e seus próximos agendamentos.') %}
+    <a class="btn btn-primary" href="{{ url_for('units') }}">Encontrar unidade</a>
+  {% endcall %}
+
+  <div class="split-grid citizen-dashboard">
+    <div class="content-stack">
+      <section class="dashboard-section">
+        {{ ui.panel_heading('Minha fila') }}
+        {% if active_entry %}
+          <div class="queue-card" data-queue-poll="{{ url_for('api_my_queue') }}">
+            <div class="queue-top">
+              <div>
+                <p>{{ active_entry.unit_name }} · {{ active_entry.service }}</p>
+                <h3 id="queue-status-label" aria-live="polite">{{ ui.queue_status(active_entry.status) }}</h3>
+              </div>
+            </div>
+            <dl class="queue-metrics">
+              <div><dt>Posição na fila</dt><dd class="queue-number" id="queue-position">{{ position.position or '—' }}</dd></div>
+              <div><dt>Espera estimada</dt><dd class="queue-number" id="queue-estimate">{{ position.estimated_minutes }} min</dd></div>
+              <div><dt>Prioridade</dt><dd>{{ 'Confirmada' if active_entry.priority_confirmed else ('A confirmar' if active_entry.priority_declared else 'Comum') }}</dd></div>
+            </dl>
+            <p class="field-hint" id="queue-updated">A posição é consultada a cada 5 segundos.</p>
+            <a class="section-link" href="{{ url_for('my_queue') }}">Ver detalhes da fila</a>
+          </div>
+        {% else %}
+          <p class="muted">Você ainda não está em uma fila. Consulte uma unidade e escolha um serviço para entrar.</p>
+        {% endif %}
+      </section>
+
+      <section class="dashboard-section">
+        {{ ui.panel_heading('Próximos agendamentos') }}
+        {% if appointments %}
+          <ul class="item-list" role="list">
+            {% for appointment in appointments %}
+              <li class="item-row">
+                {{ ui.date_tile(appointment.slot_date) }}
+                <div class="item-copy">
+                  <strong>{{ appointment.service }}</strong>
+                  <span>{{ appointment.unit_name }} · {{ appointment.slot_time }}</span>
+                </div>
+                {{ ui.badge('Confirmado', 'success') }}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">Nenhum agendamento futuro confirmado.</p>
+        {% endif %}
+        <a class="section-link" href="{{ url_for('appointments') }}">Ver meus agendamentos</a>
+      </section>
+    </div>
+
+    <aside class="dashboard-links">
+      {{ ui.panel_heading('Serviços') }}
+      <ul class="item-list" role="list">
+        <li>{{ ui.shortcut('units', 'Consultar unidades', 'Veja os serviços e entre na fila.') }}</li>
+        <li>{{ ui.shortcut('appointments', 'Agendar atendimento', 'Consulte os horários disponíveis.') }}</li>
+        <li>{{ ui.shortcut('notifications', 'Ler meus avisos', 'Veja chamadas e confirmações de atendimento.') }}</li>
+      </ul>
+    </aside>
+  </div>
+{% endblock %}

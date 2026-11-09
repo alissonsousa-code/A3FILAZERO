@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Gestão da unidade{% endblock %}
+
+{% block content %}
+  {% call ui.page_heading('Administração', 'Gestão da unidade', unit.name ~ ' · ' ~ ('Fila aberta' if unit.is_open else 'Fila encerrada')) %}
+    <form method="post" action="{{ url_for('toggle_unit') }}">
+      {{ ui.csrf() }}
+      <button class="btn {{ 'btn-danger' if unit.is_open else 'btn-primary' }}" type="submit">
+        {{ 'Encerrar fila da unidade' if unit.is_open else 'Abrir fila da unidade' }}
+      </button>
+    </form>
+  {% endcall %}
+
+  <div class="content-stack">
+    <div class="split-grid">
+      <section class="panel">
+        {{ ui.panel_heading('Criar horário', 'Cadastre vagas para um serviço da unidade.') }}
+        <form class="form-stack" method="post" action="{{ url_for('create_slot') }}">
+          {{ ui.csrf() }}
+          <div class="form-grid">
+            <div class="field field-wide">{{ ui.service_select('service') }}</div>
+            <div class="field">
+              <label for="slot_date">Data</label>
+              <input id="slot_date" type="date" name="slot_date" min="{{ today }}" required>
+            </div>
+            <div class="field">
+              <label for="slot_time">Horário</label>
+              <input id="slot_time" type="time" name="slot_time" required>
+            </div>
+            <div class="field field-wide">
+              <label for="capacity">Quantidade de vagas</label>
+              <input id="capacity" type="number" name="capacity" min="1" max="100" value="4" required>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">Disponibilizar horário</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="panel content-stack">
+        <div>
+          {{ ui.panel_heading('Acesso rápido') }}
+          {{ ui.shortcut('staff_dashboard', 'Operação da recepção', 'Presenças e chamadas de pacientes') }}
+          {{ ui.shortcut('reports', 'Relatórios de atendimento', 'Atendimentos, faltas e espera') }}
+        </div>
+        {{ ui.notice('O sistema registra alterações de vagas, mudanças na fila e ações da recepção no log interno.') }}
+      </aside>
+    </div>
+
+    <section class="panel">
+      {{ ui.panel_heading('Horários cadastrados') }}
+      {% if slots %}
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Tabela de horários cadastrados">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Data</th>
+                <th scope="col">Horário</th>
+                <th scope="col">Serviço</th>
+                <th scope="col">Reservas</th>
+                <th scope="col">Capacidade</th>
+                <th scope="col">Status</th>
+                <th scope="col">Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for slot in slots %}
+                <tr>
+                  <td><time datetime="{{ slot.slot_date }}">{{ slot.slot_date[8:10] }}/{{ slot.slot_date[5:7] }}/{{ slot.slot_date[0:4] }}</time></td>
+                  <td>{{ slot.slot_time }}</td>
+                  <td>{{ slot.service }}</td>
+                  <td>{{ slot.booked }}</td>
+                  <td>{{ slot.capacity }}</td>
+                  <td>{{ ui.badge('Ativo' if slot.active else 'Bloqueado', 'success' if slot.active else 'neutral') }}</td>
+                  <td>
+                    {% if slot.active %}
+                      <form method="post" action="{{ url_for('block_slot', slot_id=slot.id) }}">
+                        {{ ui.csrf() }}
+                        <button class="btn btn-danger-text" type="submit"
+                                aria-label="Bloquear {{ slot.service }}, {{ slot.slot_date[8:10] }}/{{ slot.slot_date[5:7] }} às {{ slot.slot_time }}">Bloquear</button>
+                      </form>
+                    {% else %}
+                      —
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        {{ ui.empty_state('Nenhum horário cadastrado', 'Crie um horário para disponibilizar vagas.') }}
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}
