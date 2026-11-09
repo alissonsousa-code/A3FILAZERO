@@ -5,8 +5,9 @@
   <section class="panel error-page">
     <div class="empty-state">
       <p class="eyebrow">Erro {{ code }}</p>
-      <h1>Não foi possível concluir</h1>
-      <p>{{ message }}</p>
+      {% set titles = {400: 'Confira os dados enviados', 403: 'Acesso não permitido', 404: 'Página não encontrada'} %}
+      <h1>{{ titles.get(code, 'Não foi possível concluir') }}</h1>
+      <p role="alert">{{ message }}</p>
       <div class="actions">
         <a class="btn btn-primary" href="{{ url_for('index') }}">{{ ui.icon('arrow-left') }} Voltar ao início</a>
       </div>
