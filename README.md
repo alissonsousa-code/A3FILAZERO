@@ -1,8 +1,8 @@
-> Organização do grupo e contribuições: [LEIA-PRIMEIRO.md](LEIA-PRIMEIRO.md). Base importada com apoio de IA; tarefas dos membros continuam pendentes de execução.
-
 # FilaZero — Sistema web demonstrativo para filas e agendamentos em UBS
 
-Projeto acadêmico da UC **Gestão e Qualidade de Software — UNIFACS**, elaborado a partir da especificação da 1ª entrega.
+Projeto acadêmico da UC **Gestão e Qualidade de Software — UNIFACS**, elaborado a partir da especificação da 1ª entrega, com apoio de IA.
+
+Organização: [LEIA-PRIMEIRO.md](LEIA-PRIMEIRO.md). Contribuições: [pacotes da equipe](contribuicoes/README.md).
 
 ## 1. O que está implementado
 
@@ -28,7 +28,7 @@ Projeto acadêmico da UC **Gestão e Qualidade de Software — UNIFACS**, elabor
 
 ## 3. Instalação no Windows
 
-Abra o PowerShell dentro da pasta `filazero_project` e execute:
+Abra o PowerShell na raiz do clone `A3FILAZERO` e execute:
 
 ```powershell
 py -m venv .venv

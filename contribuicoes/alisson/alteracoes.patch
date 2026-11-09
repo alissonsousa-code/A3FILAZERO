@@ -1,0 +1,43 @@
+diff --git a/templates/error.html b/templates/error.html
+index 60fc29e..4275d7b 100644
+--- a/templates/error.html
++++ b/templates/error.html
+@@ -5,11 +5,12 @@
+   <section class="panel error-page">
+     <div class="empty-state">
+       <p class="eyebrow">Erro {{ code }}</p>
+-      <h1>Não foi possível concluir</h1>
+-      <p>{{ message }}</p>
++      {% set titles = {400: 'Confira os dados enviados', 403: 'Acesso não permitido', 404: 'Página não encontrada'} %}
++      <h1>{{ titles.get(code, 'Não foi possível concluir') }}</h1>
++      <p role="alert">{{ message }}</p>
+       <div class="actions">
+         <a class="btn btn-primary" href="{{ url_for('index') }}">{{ ui.icon('arrow-left') }} Voltar ao início</a>
+       </div>
+     </div>
+   </section>
+-{% endblock %}
++{% endblock %}
+diff --git a/tests/test_error_pages.py b/tests/test_error_pages.py
+new file mode 100644
+index 0000000..bc759f3
+--- /dev/null
++++ b/tests/test_error_pages.py
+@@ -0,0 +1,17 @@
++from test_app import app as app, client as client
++
++
++def test_not_found_shows_actionable_title_and_home_link(client):
++    response = client.get('/pagina-inexistente')
++    assert response.status_code == 404
++    page = response.get_data(as_text=True)
++    assert 'Página não encontrada' in page
++    assert 'role="alert"' in page
++    assert 'Voltar ao início' in page
++
++
++def test_bad_csrf_shows_actionable_title(client):
++    client.get('/entrar')
++    response = client.post('/entrar', data={})
++    assert response.status_code == 400
++    assert 'Confira os dados enviados' in response.get_data(as_text=True)

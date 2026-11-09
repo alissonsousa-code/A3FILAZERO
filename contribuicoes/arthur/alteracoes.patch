@@ -1,0 +1,78 @@
+diff --git a/app.py b/app.py
+index 07d0da0..774b977 100644
+--- a/app.py
++++ b/app.py
+@@ -495,7 +495,7 @@ def create_app(test_config: dict | None = None) -> Flask:
+         db = get_db()
+         slots = db.execute(
+             """SELECT s.*, u.name AS unit_name, u.neighborhood,
+-                      (SELECT COUNT(*) FROM appointments a WHERE a.slot_id=s.id AND a.status='booked') AS booked
++                      (SELECT COUNT(*) FROM appointments a WHERE a.slot_id=s.id AND a.status IN ('booked','checked_in')) AS booked
+                FROM slots s JOIN units u ON u.id=s.unit_id
+                WHERE s.active=1 AND s.slot_date>=? ORDER BY s.slot_date, s.slot_time LIMIT 150""",
+             (date.today().isoformat(),),
+@@ -526,7 +526,7 @@ def create_app(test_config: dict | None = None) -> Flask:
+                 (session["user_id"], slot_id),
+             ).fetchone()
+             booked = db.execute(
+-                "SELECT COUNT(*) FROM appointments WHERE slot_id=? AND status='booked'", (slot_id,)
++                "SELECT COUNT(*) FROM appointments WHERE slot_id=? AND status IN ('booked','checked_in')", (slot_id,)
+             ).fetchone()[0]
+             if existing or booked >= slot["capacity"]:
+                 db.rollback()
+@@ -747,7 +747,7 @@ def create_app(test_config: dict | None = None) -> Flask:
+         user = current_user()
+         db = get_db()
+         slots = db.execute(
+-            """SELECT s.*, (SELECT COUNT(*) FROM appointments a WHERE a.slot_id=s.id AND a.status='booked') AS booked
++            """SELECT s.*, (SELECT COUNT(*) FROM appointments a WHERE a.slot_id=s.id AND a.status IN ('booked','checked_in')) AS booked
+                FROM slots s WHERE s.unit_id=? AND s.slot_date>=? ORDER BY s.slot_date, s.slot_time LIMIT 80""",
+             (user["unit_id"], date.today().isoformat()),
+         ).fetchall()
+@@ -789,7 +789,7 @@ def create_app(test_config: dict | None = None) -> Flask:
+         slot = db.execute("SELECT * FROM slots WHERE id=? AND unit_id=?", (slot_id, user["unit_id"])).fetchone()
+         if not slot:
+             abort(404)
+-        booked = db.execute("SELECT COUNT(*) FROM appointments WHERE slot_id=? AND status='booked'", (slot_id,)).fetchone()[0]
++        booked = db.execute("SELECT COUNT(*) FROM appointments WHERE slot_id=? AND status IN ('booked','checked_in')", (slot_id,)).fetchone()[0]
+         if booked:
+             flash("Não é possível bloquear: há agendamentos confirmados. Contate os cidadãos antes de alterar a vaga.", "warning")
+         else:
+diff --git a/tests/test_capacidade_checkin.py b/tests/test_capacidade_checkin.py
+new file mode 100644
+index 0000000..5596b25
+--- /dev/null
++++ b/tests/test_capacidade_checkin.py
+@@ -0,0 +1,32 @@
++from datetime import date
++
++from test_app import app as app, client as client, csrf, login, register_citizen
++
++
++def test_checkin_does_not_release_last_slot(app, client):
++    register_citizen(client)
++    login(client, 'cidadao@example.com', 'SenhaTeste@123')
++    with app.app_context():
++        db = app.get_db()
++        db.execute("INSERT INTO slots(unit_id,service,slot_date,slot_time,capacity) VALUES(1,'Consulta clínica',?,'23:50',1)", (date.today().isoformat(),))
++        sid = db.execute('SELECT last_insert_rowid()').fetchone()[0]
++    client.post('/agendamentos/criar', data={'csrf_token':csrf(client),'slot_id':sid})
++    with app.app_context():
++        aid = app.get_db().execute('SELECT id FROM appointments WHERE slot_id=?',(sid,)).fetchone()[0]
++    reception = app.test_client()
++    login(reception, 'recepcao@filazero.local', 'Recepcao@123')
++    reception.post('/equipe/agendamento/presenca', data={'csrf_token':csrf(reception),'appointment_id':aid})
++    other = app.test_client()
++    register_citizen(other, '11144477735', 'segundo@example.com')
++    login(other, 'segundo@example.com', 'SenhaTeste@123')
++    response = other.post('/agendamentos/criar', data={'csrf_token':csrf(other),'slot_id':sid}, follow_redirects=True)
++    assert 'A vaga foi ocupada' in response.get_data(as_text=True)
++    with app.app_context():
++        states = [r[0] for r in app.get_db().execute('SELECT status FROM appointments WHERE slot_id=?',(sid,))]
++    assert states == ['checked_in']
++    manager = app.test_client()
++    login(manager, 'gestor@filazero.local', 'Gestor@123')
++    response = manager.post(f'/gestao/vagas/{sid}/bloquear',data={'csrf_token':csrf(manager)},follow_redirects=True)
++    assert 'Não é possível bloquear' in response.get_data(as_text=True)
++    with app.app_context():
++        assert app.get_db().execute('SELECT active FROM slots WHERE id=?',(sid,)).fetchone()[0] == 1

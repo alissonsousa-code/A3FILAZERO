@@ -1,0 +1,31 @@
+diff --git a/.github/workflows/quality.yml b/.github/workflows/quality.yml
+index a825eba..3c3de8c 100644
+--- a/.github/workflows/quality.yml
++++ b/.github/workflows/quality.yml
+@@ -11,6 +11,12 @@ jobs:
+         with:
+           python-version: '3.11'
+       - run: python -m pip install -r requirements-dev.txt
+-      - run: python -m pytest -q
++      - run: coverage run --source=app -m pytest -q
++      - run: coverage report -m
++      - run: coverage xml -o coverage.xml
++      - uses: actions/upload-artifact@v4
++        with:
++          name: cobertura-python
++          path: coverage.xml
+       - run: ruff check .
+       - run: bandit -r app.py
+diff --git a/docs/metricas/COMO-MEDIR.md b/docs/metricas/COMO-MEDIR.md
+new file mode 100644
+index 0000000..f62302e
+--- /dev/null
++++ b/docs/metricas/COMO-MEDIR.md
+@@ -0,0 +1,7 @@
++# Medicao de qualidade
++
++Executar na raiz: `coverage run --source=app -m pytest -q`, depois `coverage report -m` e `coverage xml -o coverage.xml`.
++
++O pipeline registra o resumo e disponibiliza o XML no artefato cobertura-python. O arquivo mede Python e nao comprova cobertura de navegador ou do modulo de fila isoladamente. Nao ha limite minimo novo imposto por este workflow.
++
++Aprovacao: aprovados / executados; apresentar nao executados a parte. Correcao: defeitos corrigidos e retestados / defeitos distintos registrados. Densidade: defeitos distintos / casos de uso analisados, declarando recorte. Informar commit, ambiente e data de toda medicao.

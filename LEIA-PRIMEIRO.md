@@ -1,20 +1,15 @@
-# A3FILAZERO — comece aqui
+# FilaZero — sistema de filas e agendamentos para UBS
 
-Protótipo acadêmico FilaZero, UNIFACS — Gestão e Qualidade de Software.
+Projeto acadêmico da UNIFACS, UC Gestão e Qualidade de Software, desenvolvido com apoio de IA.
 
-## Navegação
+## Como começar
 
-- [Instalar e executar o site](README.md)
-- [Etapa atual e responsabilidades](docs/organizacao/ESTADO-E-PLANO.md)
-- [Como cada integrante faz seus commits](docs/organizacao/GUIA-GIT-POR-MEMBRO.md)
-- [Quadro de tarefas — CSV](docs/organizacao/QUADRO-EQUIPE.csv)
-- [Roteiros individuais](docs/organizacao/membros/)
-- [Métricas iniciais e limites](docs/metricas/BASELINE-2026-11-09.md)
+- [Instalar e executar](README.md)
+- [Etapa atual e plano](docs/organizacao/ESTADO-E-PLANO.md)
+- [Contribuições preparadas por integrante](contribuicoes/README.md)
+- [Quadro de tarefas](docs/organizacao/QUADRO-EQUIPE.csv)
+- [Guia de Git](docs/organizacao/GUIA-GIT-POR-MEMBRO.md)
 
-## Publicação e autoria
+## Situação
 
-Repositório: https://github.com/alissonsousa-code/A3FILAZERO
-
-Importação da base FilaZero-A3-Pacote-Completo.zip e organização preparadas com apoio de IA e publicadas a pedido do titular da conta em 09/11/2026. Os commits da importação não comprovam autoria individual dos integrantes. Cada integrante deve realizar mudanças reais, testar e enviar usando sua própria identidade e conta.
-
-A base funcional foi preservada; os defeitos e a ampliação Cypress continuam pendentes. Não há envio de banco local, ambiente Python instalado ou node_modules.
+Protótipo implementado, em validação. A branch main contém a base; correções e testes adicionais estão separados em pacotes para revisão e integração. O histórico registra as importações e as contribuições efetivamente enviadas. Consulte os testes e limites antes da apresentação.
