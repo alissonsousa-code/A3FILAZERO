@@ -672,16 +672,16 @@ def create_app(test_config: dict | None = None) -> Flask:
         db.execute("BEGIN IMMEDIATE")
         try:
             next_entry = db.execute(
-                """SELECT * FROM queue_entries WHERE unit_id=? AND status IN ('waiting','present')
+                """SELECT * FROM queue_entries WHERE unit_id=? AND status='present'
                    ORDER BY priority_confirmed DESC, created_at ASC, id ASC LIMIT 1""",
                 (user["unit_id"],),
             ).fetchone()
             if not next_entry:
                 db.rollback()
-                flash("Não há pacientes aguardando neste momento.", "info")
+                flash("Não há pacientes com presença confirmada aguardando neste momento.", "info")
                 return redirect(url_for("staff_dashboard"))
             updated = db.execute(
-                "UPDATE queue_entries SET status='called', called_at=? WHERE id=? AND status IN ('waiting','present')",
+                "UPDATE queue_entries SET status='called', called_at=? WHERE id=? AND status='present'",
                 (now_iso(), next_entry["id"]),
             ).rowcount
             if updated != 1:
