@@ -1,0 +1,173 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.7.0 -- /workspace/scratch/ccd751ca9685/A3FILAZERO/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace/scratch/ccd751ca9685/A3FILAZERO
+configfile: pyproject.toml
+collecting ... collected 2 items
+
+tests/test_regressao_reservas.py::test_cancelled_appointment_can_be_booked_again FAILED [ 50%]
+tests/test_regressao_reservas.py::test_checkin_keeps_capacity_occupied FAILED [100%]
+
+=================================== FAILURES ===================================
+________________ test_cancelled_appointment_can_be_booked_again ________________
+
+app = <Flask 'app'>, client = <FlaskClient <Flask 'app'>>
+request = <FixtureRequest for <Function test_cancelled_appointment_can_be_booked_again>>
+
+    def test_cancelled_appointment_can_be_booked_again(app, client, request):
+        register_citizen(client)
+        login(client, 'cidadao@example.com', 'SenhaTeste@123')
+        slot_id = create_single_slot(app, date.today() + timedelta(days=10))
+        response = client.post('/agendamentos/criar', data={'csrf_token': csrf(client), 'slot_id': slot_id})
+        assert response.status_code == 302
+        with app.app_context():
+            appointment_id = app.get_db().execute(
+                'SELECT id FROM appointments WHERE slot_id=?', (slot_id,),
+            ).fetchone()[0]
+        response = client.post(f'/agendamentos/cancelar/{appointment_id}', data={'csrf_token': csrf(client)})
+        assert response.status_code == 302
+        with app.app_context():
+            assert app.get_db().execute(
+                'SELECT status FROM appointments WHERE id=?', (appointment_id,),
+            ).fetchone()[0] == 'cancelled'
+
+        request.applymarker(pytest.mark.xfail(
+            strict=True, raises=sqlite3.IntegrityError,
+            reason='DEF01: UNIQUE(user_id, slot_id) impede reservar de novo após cancelar',
+        ))
+>       response = client.post('/agendamentos/criar', data={
+            'csrf_token': csrf(client), 'slot_id': slot_id,
+        }, follow_redirects=True)
+
+tests/test_regressao_reservas.py:46:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv/lib/python3.12/site-packages/werkzeug/test.py:1171: in post
+    return self.open(*args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/flask/testing.py:235: in open
+    response = super().open(
+.venv/lib/python3.12/site-packages/werkzeug/test.py:1120: in open
+    response_parts = self.run_wsgi_app(request.environ, buffered=buffered)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/werkzeug/test.py:992: in run_wsgi_app
+    rv = run_wsgi_app(self.application, environ, buffered=buffered)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/werkzeug/test.py:1268: in run_wsgi_app
+    app_rv = app(environ, start_response)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/flask/app.py:1536: in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/flask/app.py:1514: in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/flask/app.py:1511: in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/flask/app.py:919: in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/flask/app.py:917: in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/flask/app.py:902: in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app.py:233: in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+app.py:244: in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    @app.post("/agendamentos/criar")
+    @roles_required("citizen")
+    def book_slot():
+        db = get_db()
+        slot_id = request.form.get("slot_id", type=int)
+        # BEGIN IMMEDIATE serializa as reservas concorrentes na mesma base SQLite.
+        db.execute("BEGIN IMMEDIATE")
+        try:
+            slot = db.execute("SELECT * FROM slots WHERE id=? AND active=1", (slot_id,)).fetchone()
+            if not slot or slot["slot_date"] < date.today().isoformat():
+                db.rollback()
+                flash("Este horário não está mais disponível.", "error")
+                return redirect(url_for("appointments"))
+            existing = db.execute(
+                "SELECT id FROM appointments WHERE user_id=? AND slot_id=? AND status='booked'",
+                (session["user_id"], slot_id),
+            ).fetchone()
+            booked = db.execute(
+                "SELECT COUNT(*) FROM appointments WHERE slot_id=? AND status='booked'", (slot_id,)
+            ).fetchone()[0]
+            if existing or booked >= slot["capacity"]:
+                db.rollback()
+                flash("A vaga foi ocupada ou você já possui reserva neste horário. Escolha outro horário.", "warning")
+                return redirect(url_for("appointments"))
+            code = "FZ-" + secrets.token_hex(3).upper()
+>           db.execute(
+                "INSERT INTO appointments(user_id, slot_id, status, code, created_at) VALUES(?,?,?,?,?)",
+                (session["user_id"], slot_id, "booked", code, now_iso()),
+            )
+E           sqlite3.IntegrityError: UNIQUE constraint failed: appointments.user_id, appointments.slot_id
+
+app.py:536: IntegrityError
+_____________________ test_checkin_keeps_capacity_occupied _____________________
+
+app = <Flask 'app'>, client = <FlaskClient <Flask 'app'>>
+request = <FixtureRequest for <Function test_checkin_keeps_capacity_occupied>>
+
+    def test_checkin_keeps_capacity_occupied(app, client, request):
+        register_citizen(client)
+        login(client, 'cidadao@example.com', 'SenhaTeste@123')
+        slot_id = create_single_slot(app, date.today())
+        response = client.post('/agendamentos/criar', data={'csrf_token': csrf(client), 'slot_id': slot_id})
+        assert response.status_code == 302
+        with app.app_context():
+            appointment_id = app.get_db().execute(
+                'SELECT id FROM appointments WHERE slot_id=?', (slot_id,),
+            ).fetchone()[0]
+        reception = app.test_client()
+        login(reception, 'recepcao@filazero.local', 'Recepcao@123')
+        response = reception.post('/equipe/agendamento/presenca', data={
+            'csrf_token': csrf(reception), 'appointment_id': appointment_id,
+        })
+        assert response.status_code == 302
+        with app.app_context():
+            assert app.get_db().execute(
+                'SELECT status FROM appointments WHERE id=?', (appointment_id,),
+            ).fetchone()[0] == 'checked_in'
+
+        other = app.test_client()
+        register_citizen(other, '11144477735', 'outro@example.com')
+        login(other, 'outro@example.com', 'SenhaTeste@123')
+        response = other.post('/agendamentos/criar', data={
+            'csrf_token': csrf(other), 'slot_id': slot_id,
+        }, follow_redirects=True)
+        assert response.status_code == 200
+        with app.app_context():
+            states = [row[0] for row in app.get_db().execute(
+                'SELECT status FROM appointments WHERE slot_id=? ORDER BY id', (slot_id,),
+            )]
+        request.applymarker(pytest.mark.xfail(
+            strict=True, raises=AssertionError,
+            reason='DEF02: check-in deixa de contar na capacidade e permite uma segunda reserva',
+        ))
+>       assert states == ['checked_in'], f'Capacidade=1; estados observados: {states}'
+E       AssertionError: Capacidade=1; estados observados: ['checked_in', 'booked']
+E       assert ['checked_in', 'booked'] == ['checked_in']
+E
+E         Left contains one more item: 'booked'
+E
+E         Full diff:
+E           [
+E               'checked_in',
+E         +     'booked',
+E           ]
+
+tests/test_regressao_reservas.py:95: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_regressao_reservas.py::test_cancelled_appointment_can_be_booked_again
+FAILED tests/test_regressao_reservas.py::test_checkin_keeps_capacity_occupied
+============================== 2 failed in 0.91s ===============================
