@@ -1,0 +1,22 @@
+{
+  "base_commit": "bff421a9ac7b2d488d9dc47fdef35bdd35fd7b61",
+  "branch": "miguel/regressao-seguranca",
+  "evidence_recorded_at": "2026-11-13T09:45:47.257351-03:00",
+  "execution": "Linux, com assistência de IA a pedido de Miguel; dados fictícios e SQLite temporário por teste",
+  "python_results": {
+    "executed": 28,
+    "passed": 26,
+    "known_failures_xfail": 2
+  },
+  "cypress": "não executado; download do binário retornou conteúdo inválido",
+  "sha256": {
+    "app.py": "3834d718feca346b7c5d583faa2abbcaa3491e3c6f703519b0a962c7697b217e",
+    "requirements.txt": "c38fc761542de3be6d66d35ee1dc430ccca2d5cb1dd58a45f726f9fcfb308457",
+    "requirements-dev.txt": "956eedb32cbaa976d80677fb0805746d341c969682eadc035451e1f4323fbc4d",
+    "pyproject.toml": "1e6498f17c98a020f2578245c9ae7c7054b3d74a1c64a215316970e3f505478a",
+    "tests/test_protecao_sessao.py": "9146dfeb56d63b7895fda48721d49f1f5293cfa305d968e9b1b5f0fcd0ec374f",
+    "tests/test_fila.py": "d1c3790bdadbc0c2b3e8d507b5e8308b65cb5ad105e093ee6756af7a144056fc",
+    "tests/test_seguranca.py": "729c32067fe9ea34e36d621e1029bc70f52991eef9fefb0d81b6bc13013470e3",
+    "tests/test_regressao_reservas.py": "73004a9bf6e73bfa58f4fcd0cae78c52f312ebcbc26a750be1cdb4c53cc8e8c1"
+  }
+}

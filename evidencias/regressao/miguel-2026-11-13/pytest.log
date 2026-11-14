@@ -1,0 +1,42 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.7.0 -- /workspace/scratch/ccd751ca9685/A3FILAZERO/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace/scratch/ccd751ca9685/A3FILAZERO
+configfile: pyproject.toml
+testpaths: tests
+collecting ... collected 28 items
+
+tests/test_app.py::test_home_page_loads PASSED                           [  3%]
+tests/test_app.py::test_cpf_validator PASSED                             [  7%]
+tests/test_app.py::test_register_and_login PASSED                        [ 10%]
+tests/test_app.py::test_citizen_can_join_only_one_active_queue PASSED    [ 14%]
+tests/test_app.py::test_manager_area_is_forbidden_to_citizen PASSED      [ 17%]
+tests/test_app.py::test_booking_respects_slot_capacity PASSED            [ 21%]
+tests/test_app.py::test_priority_confirmed_patient_is_called_first PASSED [ 25%]
+tests/test_app.py::test_slot_capacity_rejects_second_citizen PASSED      [ 28%]
+tests/test_error_pages.py::test_not_found_shows_actionable_title_and_home_link PASSED [ 32%]
+tests/test_error_pages.py::test_bad_csrf_shows_actionable_title PASSED   [ 35%]
+tests/test_fila.py::test_closed_unit_refuses_queue_entry PASSED          [ 39%]
+tests/test_fila.py::test_declared_priority_alone_does_not_jump_the_queue PASSED [ 42%]
+tests/test_fila.py::test_attendance_follows_presence_call_start_and_completion PASSED [ 46%]
+tests/test_fila.py::test_citizen_can_rejoin_after_cancelling_queue PASSED [ 50%]
+tests/test_presenca.py::test_call_next_skips_citizen_without_presence PASSED [ 53%]
+tests/test_presenca.py::test_call_next_selects_present_even_if_waiting_entered_first PASSED [ 57%]
+tests/test_protecao_sessao.py::test_post_without_csrf_is_denied_and_does_not_join_queue PASSED [ 60%]
+tests/test_protecao_sessao.py::test_inactive_session_requires_login_again PASSED [ 64%]
+tests/test_protecao_sessao.py::test_citizen_cannot_cancel_someone_elses_appointment PASSED [ 67%]
+tests/test_regressao_reservas.py::test_cancelled_appointment_can_be_booked_again XFAIL [ 71%]
+tests/test_regressao_reservas.py::test_checkin_keeps_capacity_occupied XFAIL [ 75%]
+tests/test_seguranca.py::test_wrong_csrf_token_cannot_change_queue PASSED [ 78%]
+tests/test_seguranca.py::test_citizen_cannot_cancel_someone_elses_queue PASSED [ 82%]
+tests/test_seguranca.py::test_citizen_cannot_execute_staff_actions[chamar-proximo] PASSED [ 85%]
+tests/test_seguranca.py::test_citizen_cannot_execute_staff_actions[presenca] PASSED [ 89%]
+tests/test_seguranca.py::test_citizen_cannot_execute_staff_actions[iniciar] PASSED [ 92%]
+tests/test_seguranca.py::test_citizen_cannot_execute_staff_actions[concluir] PASSED [ 96%]
+tests/test_seguranca.py::test_receptionist_cannot_change_queue_from_another_unit PASSED [100%]
+
+- generated xml file: /workspace/scratch/ccd751ca9685/A3FILAZERO/evidencias/regressao/miguel-2026-11-13/pytest.xml -
+=========================== short test summary info ============================
+XFAIL tests/test_regressao_reservas.py::test_cancelled_appointment_can_be_booked_again - DEF01: UNIQUE(user_id, slot_id) impede reservar de novo após cancelar
+XFAIL tests/test_regressao_reservas.py::test_checkin_keeps_capacity_occupied - DEF02: check-in deixa de contar na capacidade e permite uma segunda reserva
+======================== 26 passed, 2 xfailed in 10.11s ========================
