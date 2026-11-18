@@ -1,3 +1,5 @@
+import { citizen, login, logout, receptionist } from '../support/login';
+
 describe('FilaZero - pagina publica e protecao de acesso', () => {
   it('abre a pagina inicial com acesso ao login', () => {
     cy.visit('/');
@@ -20,5 +22,26 @@ describe('FilaZero - pagina publica e protecao de acesso', () => {
     cy.visit('/gestao');
     cy.url().should('include', '/entrar');
     cy.contains('Entre na sua conta para continuar.').should('be.visible');
+  });
+});
+
+describe('FilaZero - permissões por perfil', () => {
+  it('impede que o cidadão acesse recepção ou gestão', () => {
+    login(citizen, '/painel');
+    for (const path of ['/equipe', '/gestao']) {
+      cy.visit(path, { failOnStatusCode: false });
+      cy.contains('h1', 'Acesso não permitido').should('be.visible');
+      cy.contains('Erro 403').should('be.visible');
+    }
+  });
+
+  it('impede que a recepção acesse gestão e encerra o acesso após sair', () => {
+    login(receptionist, '/equipe');
+    cy.visit('/gestao', { failOnStatusCode: false });
+    cy.contains('h1', 'Acesso não permitido').should('be.visible');
+    cy.contains('Erro 403').should('be.visible');
+    logout();
+    cy.visit('/equipe');
+    cy.location('pathname').should('eq', '/entrar');
   });
 });

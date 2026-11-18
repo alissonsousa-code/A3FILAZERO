@@ -20,3 +20,37 @@ jobs:
           path: coverage.xml
       - run: ruff check .
       - run: bandit -r app.py
+
+  cypress-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      FILAZERO_DATABASE: ${{ runner.temp }}/filazero-e2e.sqlite3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: python -m pip install -r requirements.txt
+      - run: npm ci
+      - name: Run Cypress against Flask
+        run: |
+          python app.py > flask-e2e.log 2>&1 &
+          flask_pid=$!
+          trap 'kill "$flask_pid" 2>/dev/null || true' EXIT
+          curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 1 \
+            --output /dev/null http://127.0.0.1:5000/entrar
+          npm run cy:run
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: diagnostico-cypress
+          path: |
+            flask-e2e.log
+            cypress/screenshots/
