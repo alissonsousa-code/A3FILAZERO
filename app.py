@@ -52,6 +52,44 @@ def create_app(test_config: dict | None = None) -> Flask:
     def now_iso() -> str:
         return datetime.now().isoformat(timespec="seconds")
 
+    def migrate_appointments_unique(db: sqlite3.Connection) -> None:
+        """DEF01: a restricao UNIQUE(user_id, slot_id) impedia reservar de novo apos cancelar.
+
+        Bancos antigos sao reconstruidos sem a restricao, preservando o historico. A regra
+        passa a ser: no maximo uma reserva ATIVA (booked/checked_in) por pessoa e horario.
+        """
+        table_sql = db.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='appointments'"
+        ).fetchone()[0]
+        if "UNIQUE(user_id, slot_id)" in table_sql:
+            db.executescript(
+                """
+                PRAGMA foreign_keys = OFF;
+                BEGIN;
+                CREATE TABLE appointments_new (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL REFERENCES users(id),
+                    slot_id INTEGER NOT NULL REFERENCES slots(id),
+                    status TEXT NOT NULL DEFAULT 'booked',
+                    code TEXT NOT NULL UNIQUE,
+                    created_at TEXT NOT NULL,
+                    cancelled_at TEXT,
+                    checked_in_at TEXT
+                );
+                INSERT INTO appointments_new SELECT id, user_id, slot_id, status, code, created_at,
+                    cancelled_at, checked_in_at FROM appointments;
+                DROP TABLE appointments;
+                ALTER TABLE appointments_new RENAME TO appointments;
+                CREATE INDEX IF NOT EXISTS idx_appointments_slot_status ON appointments(slot_id, status);
+                COMMIT;
+                PRAGMA foreign_keys = ON;
+                """
+            )
+        db.execute(
+            """CREATE UNIQUE INDEX IF NOT EXISTS uq_appointment_active_user_slot
+               ON appointments(user_id, slot_id) WHERE status IN ('booked','checked_in')"""
+        )
+
     def init_db() -> None:
         db = get_db()
         db.executescript(
@@ -116,8 +154,7 @@ def create_app(test_config: dict | None = None) -> Flask:
                 code TEXT NOT NULL UNIQUE,
                 created_at TEXT NOT NULL,
                 cancelled_at TEXT,
-                checked_in_at TEXT,
-                UNIQUE(user_id, slot_id)
+                checked_in_at TEXT
             );
             CREATE INDEX IF NOT EXISTS idx_appointments_slot_status ON appointments(slot_id, status);
             CREATE TABLE IF NOT EXISTS notifications (
@@ -138,6 +175,7 @@ def create_app(test_config: dict | None = None) -> Flask:
             );
             """
         )
+        migrate_appointments_unique(db)
 
         if db.execute("SELECT COUNT(*) FROM units").fetchone()[0] == 0:
             demo_units = [
@@ -495,7 +533,7 @@ def create_app(test_config: dict | None = None) -> Flask:
         db = get_db()
         slots = db.execute(
             """SELECT s.*, u.name AS unit_name, u.neighborhood,
-                      (SELECT COUNT(*) FROM appointments a WHERE a.slot_id=s.id AND a.status='booked') AS booked
+                      (SELECT COUNT(*) FROM appointments a WHERE a.slot_id=s.id AND a.status IN ('booked','checked_in')) AS booked
                FROM slots s JOIN units u ON u.id=s.unit_id
                WHERE s.active=1 AND s.slot_date>=? ORDER BY s.slot_date, s.slot_time LIMIT 150""",
             (date.today().isoformat(),),
@@ -522,11 +560,11 @@ def create_app(test_config: dict | None = None) -> Flask:
                 flash("Este horário não está mais disponível.", "error")
                 return redirect(url_for("appointments"))
             existing = db.execute(
-                "SELECT id FROM appointments WHERE user_id=? AND slot_id=? AND status='booked'",
+                "SELECT id FROM appointments WHERE user_id=? AND slot_id=? AND status IN ('booked','checked_in')",
                 (session["user_id"], slot_id),
             ).fetchone()
             booked = db.execute(
-                "SELECT COUNT(*) FROM appointments WHERE slot_id=? AND status='booked'", (slot_id,)
+                "SELECT COUNT(*) FROM appointments WHERE slot_id=? AND status IN ('booked','checked_in')", (slot_id,)
             ).fetchone()[0]
             if existing or booked >= slot["capacity"]:
                 db.rollback()
@@ -747,7 +785,7 @@ def create_app(test_config: dict | None = None) -> Flask:
         user = current_user()
         db = get_db()
         slots = db.execute(
-            """SELECT s.*, (SELECT COUNT(*) FROM appointments a WHERE a.slot_id=s.id AND a.status='booked') AS booked
+            """SELECT s.*, (SELECT COUNT(*) FROM appointments a WHERE a.slot_id=s.id AND a.status IN ('booked','checked_in')) AS booked
                FROM slots s WHERE s.unit_id=? AND s.slot_date>=? ORDER BY s.slot_date, s.slot_time LIMIT 80""",
             (user["unit_id"], date.today().isoformat()),
         ).fetchall()
@@ -789,7 +827,7 @@ def create_app(test_config: dict | None = None) -> Flask:
         slot = db.execute("SELECT * FROM slots WHERE id=? AND unit_id=?", (slot_id, user["unit_id"])).fetchone()
         if not slot:
             abort(404)
-        booked = db.execute("SELECT COUNT(*) FROM appointments WHERE slot_id=? AND status='booked'", (slot_id,)).fetchone()[0]
+        booked = db.execute("SELECT COUNT(*) FROM appointments WHERE slot_id=? AND status IN ('booked','checked_in')", (slot_id,)).fetchone()[0]
         if booked:
             flash("Não é possível bloquear: há agendamentos confirmados. Contate os cidadãos antes de alterar a vaga.", "warning")
         else:
